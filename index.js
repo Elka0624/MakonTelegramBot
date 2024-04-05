@@ -1,5 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
-
+const { gameOption, againOption} = require("./option")
 
 const token = "6875436247:AAFGG9QjpryIxlOxaM7FXWFFP6CF-eygJFo";
 
@@ -7,60 +7,7 @@ const bot = new TelegramBot(token, {polling: true});
 
 const obj = {};
 
-const gameOption = {
-  reply_markup: {
-    inline_keyboard: [
-      [
-        {
-          text: "1",
-          callback_data: '1',
-        },
-        {
-          text: "2",
-          callback_data: '2',
-        },
-        {
-          text: "3",
-          callback_data: '3',
-        },
-      ],
-      [
-        {
-          text: "4",
-          callback_data: '4',
-        },
-        {
-          text: "5",
-          callback_data: '5',
-        },
-        {
-          text: "6",
-          callback_data: '6',
-        },
-      ],
-      [
-        {
-          text: "7",
-          callback_data: '7',
-        },
-        {
-          text: "8",
-          callback_data: '8',
-        },
-        {
-          text: "9",
-          callback_data: '9',
-        },
-      ],
-      [
-        {
-          text: "0",
-          callback_data: "0"
-        }
-      ]
-    ]
-  }
-};
+
 
 const startGame = async chatId => {
   await bot.sendMessage(
@@ -72,18 +19,7 @@ const startGame = async chatId => {
   await bot.sendMessage(chatId, "To'g'ri sonni toping", gameOption)
 }  
 
-const againOption = {
-  reply_markup: {
-    inline_keyboard: [
-      [
-        {
-          text: "Qaytadan boshlash",
-          callback_data: "/again"
-        }
-      ]
-    ]
-  }
-}
+
 
 const bootstrap = () => {
   bot.setMyCommands([
@@ -98,6 +34,10 @@ const bootstrap = () => {
     {
       command: "/game",
       description: "O'yin o'ynash",
+    },
+    {
+      command: "/phone",
+      description: "telefon raqam berish",
     }
   ])
   
@@ -115,8 +55,23 @@ const bootstrap = () => {
     if(text === "/game"){
       return startGame(chatId)
     }
+    if(text === "/phone"){
+      // await bot.sendMessage(chatId, "Nomer Ulashish", getContact);
+      const chatId = msg.chat.id;
+      bot.sendMessage(chatId, 'Assalomu alaykum! Telefon raqamingizni yuboring:', {
+          reply_markup: {
+              keyboard: [[{ text: "Telefon raqamini jo'natish", request_contact: true }]],
+              resize_keyboard: true
+          }
+      });
+    }
   
   });
+  bot.on("contact", msg => {
+    const chatId = msg.chat.id;
+    const phoneNumber = msg.contact.phone_number;
+    bot.sendMessage(chatId, `Sizning telefon raqamingiz: ${phoneNumber}`);
+  })
 
   bot.on("callback_query", msg => {
     const data = msg.data;
