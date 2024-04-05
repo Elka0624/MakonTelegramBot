@@ -62,13 +62,25 @@ const gameOption = {
   }
 };
 
+const startGame = async chatId => {
+  await bot.sendMessage(
+    chatId,
+    "Bot 0dan 9gacha son o'ylaydi, siz uni tpishga  harakat qiling"
+  );
+  const randomNumber = Math.floor(Math.random() * 10);
+  obj[chatId] = randomNumber;
+  await bot.sendMessage(chatId, "To'g'ri sonni toping", gameOption)
+}  
+
 const againOption = {
   reply_markup: {
     inline_keyboard: [
-      {
-        text: "Qaytadan boshlash",
-        callback_data: "/again"
-      }
+      [
+        {
+          text: "Qaytadan boshlash",
+          callback_data: "/again"
+        }
+      ]
     ]
   }
 }
@@ -101,13 +113,7 @@ const bootstrap = () => {
     }
 
     if(text === "/game"){
-      await bot.sendMessage(
-        chatId,
-        "Bot 0dan 9gacha son o'ylaydi, siz uni tpishga  harakat qiling"
-      );
-      const randomNumber = Math.floor(Math.random() * 10);
-      obj[chatId] = randomNumber;
-      return bot.sendMessage(chatId, "To'g'ri sonni toping", gameOption)
+      return startGame(chatId)
     }
   
   });
@@ -115,6 +121,10 @@ const bootstrap = () => {
   bot.on("callback_query", msg => {
     const data = msg.data;
     const chatId = msg.message.chat.id;
+
+    if(data === "/again"){
+      return startGame(chatId);
+    }
 
     if(data == obj[chatId]) {
       return bot.sendMessage(
